@@ -1,0 +1,7 @@
+.venv/
+.env
+*.pyc
+__pycache__/
+*.md.bak
+.DS_Store
+*.log
