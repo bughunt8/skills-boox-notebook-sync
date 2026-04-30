@@ -45,13 +45,16 @@ _dl() {
   fi
 }
 
-_dl "${RAW}/SKILL.md"              "${SKILL_DIR}/SKILL.md"
-_dl "${RAW}/scripts/boox_ocr.py"   "${SKILL_DIR}/scripts/boox_ocr.py"
-_dl "${RAW}/references/BOOX_SETUP.md" "${SKILL_DIR}/references/BOOX_SETUP.md"
-_dl "${RAW}/references/PROVIDER_GUIDE.md" "${SKILL_DIR}/references/PROVIDER_GUIDE.md"
-_dl "${RAW}/templates/note_output.md" "${SKILL_DIR}/templates/note_output.md"
+_dl "${RAW}/SKILL.md"                          "${SKILL_DIR}/SKILL.md"
+_dl "${RAW}/scripts/boox_ocr.py"               "${SKILL_DIR}/scripts/boox_ocr.py"
+_dl "${RAW}/scripts/run_boox_ocr.sh"           "${SKILL_DIR}/scripts/run_boox_ocr.sh"
+_dl "${RAW}/references/BOOX_SETUP.md"          "${SKILL_DIR}/references/BOOX_SETUP.md"
+_dl "${RAW}/references/PROVIDER_GUIDE.md"      "${SKILL_DIR}/references/PROVIDER_GUIDE.md"
+_dl "${RAW}/templates/note_output.md"          "${SKILL_DIR}/templates/note_output.md"
+_dl "${RAW}/.env.example"                      "${SKILL_DIR}/.env.example"
 
 chmod +x "${SKILL_DIR}/scripts/boox_ocr.py"
+chmod +x "${SKILL_DIR}/scripts/run_boox_ocr.sh"
 
 # ── 4. set up Python venv + dependencies ─────────────────────────────────────
 info "Setting up Python virtual environment..."
@@ -74,32 +77,9 @@ esac
 
 deactivate
 
-# ── 5. write wrapper script ───────────────────────────────────────────────────
 WRAPPER="${SKILL_DIR}/scripts/run_boox_ocr.sh"
-cat > "${WRAPPER}" << WRAPEOF
-#!/usr/bin/env bash
-# Activates the skill venv and runs boox_ocr.py
-source "${VENV_DIR}/bin/activate"
-python3 "${SKILL_DIR}/scripts/boox_ocr.py" "\$@"
-deactivate
-WRAPEOF
-chmod +x "${WRAPPER}"
 
-# ── 6. write .env template ────────────────────────────────────────────────────
-ENV_FILE="${SKILL_DIR}/.env.example"
-cat > "${ENV_FILE}" << ENVEOF
-# Copy this to ~/.hermes/skills/productivity/boox-reader/.env and fill in your values
-# Then source it in your shell profile: source ~/.hermes/skills/productivity/boox-reader/.env
-
-export BOOX_SYNC_PATH="$HOME/Google Drive/BOOX/Notes"
-export BOOX_OCR_PROVIDER="openai"          # openai | anthropic | google
-export OPENAI_API_KEY="sk-..."
-# export ANTHROPIC_API_KEY="sk-ant-..."
-# export GOOGLE_API_KEY="AIza..."
-export BOOX_READER_LANG_HINT="en"          # ISO 639-1 language code
-ENVEOF
-
-# ── 7. interactive config (if running in a terminal) ─────────────────────────
+# ── 5. interactive config (if running in a terminal) ─────────────────────────
 if [ -t 0 ] && [ -t 1 ]; then
   info "Interactive setup..."
   echo ""
